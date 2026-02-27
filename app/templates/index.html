@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EduAI | Smart Course Recommendation</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            width: 420px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            color: white;
+        }
+
+        .card h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card p.tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            margin-bottom: 20px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: #ffffff;
+            color: #764ba2;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background: #f1f1f1;
+            transform: translateY(-2px);
+        }
+
+        #result {
+            margin-top: 25px;
+            font-size: 16px;
+        }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>🎓 EduAI</h1>
+    <p class="tagline">Intelligent Course Recommendation Engine</p>
+
+    <input type="number" id="studentId" placeholder="Enter Student ID" />
+    <button onclick="getRecommendation()">Generate AI Recommendation</button>
+
+    <div id="result"></div>
+
+    <div class="footer">
+        Powered by FastAPI • Machine Learning • RandomForest
+    </div>
+</div>
+
+<script>
+async function getRecommendation() {
+    const id = document.getElementById("studentId").value;
+
+    if (!id) {
+        alert("Please enter Student ID");
+        return;
+    }
+
+    const response = await fetch(`/students/${id}/recommend`);
+    const data = await response.json();
+
+    if (data.detail) {
+        document.getElementById("result").innerHTML =
+            `<div class="result-box">${data.detail}</div>`;
+    } else {
+        document.getElementById("result").innerHTML =
+            `<div class="result-box">
+                <strong>Recommended Course:</strong> ${data.predicted_course}<br>
+                <strong>Confidence:</strong> ${data.confidence_percentage}%
+            </div>`;
+    }
+}
+</script>
+
+</body>
+</html>
