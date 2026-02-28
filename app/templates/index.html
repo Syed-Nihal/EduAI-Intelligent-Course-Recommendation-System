@@ -115,18 +115,34 @@ async function getRecommendation() {
         return;
     }
 
-    const response = await fetch(`/students/${id}/recommend`);
-    const data = await response.json();
+    try {
+        const response = await fetch("/students/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                student_id: parseInt(id)
+            })
+        });
 
-    if (data.detail) {
-        document.getElementById("result").innerHTML =
-            `<div class="result-box">${data.detail}</div>`;
-    } else {
+        const data = await response.json();
+
+        if (!response.ok) {
+            document.getElementById("result").innerHTML =
+                `<div class="result-box">${data.detail || "Error occurred"}</div>`;
+            return;
+        }
+
         document.getElementById("result").innerHTML =
             `<div class="result-box">
                 <strong>Recommended Course:</strong> ${data.predicted_course}<br>
                 <strong>Confidence:</strong> ${data.confidence_percentage}%
             </div>`;
+
+    } catch (error) {
+        document.getElementById("result").innerHTML =
+            `<div class="result-box">Server error. Please try again.</div>`;
     }
 }
 </script>
