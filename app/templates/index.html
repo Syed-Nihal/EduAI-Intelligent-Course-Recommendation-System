@@ -2,90 +2,49 @@
 <html>
 <head>
     <title>EduAI | Smart Course Recommendation</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
         body {
-            height: 100vh;
+            height:100vh;
             background: linear-gradient(135deg, #667eea, #764ba2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display:flex;
+            justify-content:center;
+            align-items:center;
         }
-
         .card {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255,255,255,0.15);
             backdrop-filter: blur(15px);
-            padding: 40px;
-            width: 420px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            text-align: center;
-            color: white;
+            padding:40px;
+            width:420px;
+            border-radius:20px;
+            box-shadow:0 15px 35px rgba(0,0,0,0.2);
+            text-align:center;
+            color:white;
         }
-
-        .card h1 {
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .card p.tagline {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 30px;
-        }
-
         input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            outline: none;
-            margin-bottom: 20px;
-            font-size: 15px;
+            width:100%;
+            padding:12px;
+            border-radius:10px;
+            border:none;
+            margin-bottom:15px;
+            font-size:15px;
         }
-
         button {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: #ffffff;
-            color: #764ba2;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s ease;
+            width:100%;
+            padding:12px;
+            border-radius:10px;
+            border:none;
+            background:white;
+            color:#764ba2;
+            font-weight:600;
+            cursor:pointer;
         }
-
-        button:hover {
-            background: #f1f1f1;
-            transform: translateY(-2px);
-        }
-
-        #result {
-            margin-top: 25px;
-            font-size: 16px;
-        }
-
+        #result { margin-top:20px; }
         .result-box {
-            margin-top: 15px;
-            padding: 15px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 12px;
-        }
-
-        .footer {
-            margin-top: 25px;
-            font-size: 12px;
-            opacity: 0.8;
+            padding:15px;
+            background:rgba(255,255,255,0.2);
+            border-radius:12px;
         }
     </style>
 </head>
@@ -94,24 +53,26 @@
 
 <div class="card">
     <h1>🎓 EduAI</h1>
-    <p class="tagline">Intelligent Course Recommendation Engine</p>
+    <p>AI Course Recommendation Engine</p>
 
-    <input type="number" id="studentId" placeholder="Enter Student ID" />
+    <input type="number" id="age" placeholder="Age">
+    <input type="number" id="attendance" placeholder="Attendance %">
+    <input type="number" id="marks" placeholder="Marks">
+
     <button onclick="getRecommendation()">Generate AI Recommendation</button>
 
     <div id="result"></div>
-
-    <div class="footer">
-        Powered by FastAPI • Machine Learning • RandomForest
-    </div>
 </div>
 
 <script>
 async function getRecommendation() {
-    const id = document.getElementById("studentId").value;
 
-    if (!id) {
-        alert("Please enter Student ID");
+    const age = parseInt(document.getElementById("age").value);
+    const attendance = parseFloat(document.getElementById("attendance").value);
+    const marks = parseFloat(document.getElementById("marks").value);
+
+    if (!age || !attendance || !marks) {
+        alert("Please fill all fields");
         return;
     }
 
@@ -122,7 +83,9 @@ async function getRecommendation() {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                student_id: parseInt(id)
+                age: age,
+                attendance: attendance,
+                marks: marks
             })
         });
 
@@ -130,7 +93,7 @@ async function getRecommendation() {
 
         if (!response.ok) {
             document.getElementById("result").innerHTML =
-                `<div class="result-box">${data.detail || "Error occurred"}</div>`;
+                `<div class="result-box">${JSON.stringify(data.detail)}</div>`;
             return;
         }
 
@@ -142,7 +105,7 @@ async function getRecommendation() {
 
     } catch (error) {
         document.getElementById("result").innerHTML =
-            `<div class="result-box">Server error. Please try again.</div>`;
+            `<div class="result-box">Server error</div>`;
     }
 }
 </script>

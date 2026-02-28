@@ -1,36 +1,53 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from app.database import get_db
+from app import models, schemas
 import joblib
 import os
 import numpy as np
 
-from app.database import get_db
-from app import models, schemas
-
-# Router
 router = APIRouter(prefix="/students", tags=["Students"])
 
-# ============================
-# CRUD ENDPOINTS
-# ============================
 
-@router.post("/")
+# ==============================
+# Load ML Model
+# ==============================
+
+MODEL_PATH = "app/ml/model.pkl"
+
+if os.path.exists(MODEL_PATH):
+    model = joblib.load(MODEL_PATH)
+else:
+    model = None
+
+
+# ==============================
+# CREATE STUDENT
+# ==============================
+
+@router.post("/", response_model=schemas.StudentResponse)
 def create_student(student: schemas.StudentCreate, db: Session = Depends(get_db)):
     db_student = models.Student(**student.dict())
     db.add(db_student)
     db.commit()
     db.refresh(db_student)
-    return {"message": "Student created successfully"}
+    return db_student
 
 
-@router.get("/")
-def get_all_students(db: Session = Depends(get_db)):
-    students = db.query(models.Student).all()
-    return students
+# ==============================
+# GET ALL STUDENTS
+# ==============================
+
+@router.get("/", response_model=list[schemas.StudentResponse])
+def get_students(db: Session = Depends(get_db)):
+    return db.query(models.Student).all()
 
 
-@router.get("/{student_id}")
+# ==============================
+# GET SINGLE STUDENT
+# ==============================
+
+@router.get("/{student_id}", response_model=schemas.StudentResponse)
 def get_student(student_id: int, db: Session = Depends(get_db)):
     student = db.query(models.Student).filter(models.Student.id == student_id).first()
     if not student:
@@ -38,35 +55,29 @@ def get_student(student_id: int, db: Session = Depends(get_db)):
     return student
 
 
-# ============================
-# REAL-TIME ML PREDICTION
-# ============================
+# ==============================
+# PREDICT COURSE
+# ==============================
 
-MODEL_PATH = "app/ml/student_model.pkl"
+@router.post("/predict", response_model=schemas.PredictionResponse)
+def predict_course(data: schemas.StudentPredict):
 
+    if model is None:
+        raise HTTPException(status_code=500, detail="ML model not loaded")
 
-class PredictionInput(BaseModel):
-    age: int
-    attendance: float
-    marks: float
-    interest_level: int
-
-
-@router.post("/predict")
-def predict_course(data: PredictionInput):
-
-    if not os.path.exists(MODEL_PATH):
-        raise HTTPException(status_code=400, detail="Model not trained yet")
-
-    model = joblib.load(MODEL_PATH)
-
-    features = np.array([[data.age, data.attendance, data.marks, data.interest_level]])
+    # Prepare input for model
+    features = np.array([[data.age, data.attendance, data.marks]])
 
     prediction = model.predict(features)[0]
-    probabilities = model.predict_proba(features)[0]
-    confidence = round(max(probabilities) * 100, 2)
+
+    # Optional: confidence (if using RandomForest)
+    if hasattr(model, "predict_proba"):
+        probabilities = model.predict_proba(features)
+        confidence = float(np.max(probabilities) * 100)
+    else:
+        confidence = 100.0
 
     return {
         "predicted_course": prediction,
-        "confidence_percentage": confidence
+        "confidence_percentage": round(confidence, 2)
     }
