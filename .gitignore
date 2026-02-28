@@ -34,7 +34,6 @@ ENV/
 # ===============================
 # Machine Learning Model Files
 # ===============================
-*.pkl
 *.joblib
 models/
 
