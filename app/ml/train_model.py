@@ -9,10 +9,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 
 
-DATABASE = "students.db"
+# =========================
+# Database & Model Path
+# =========================
 
-# Dynamically get correct model save path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATABASE = os.path.join(BASE_DIR, "students.db")
 MODEL_PATH = os.path.join(BASE_DIR, "ml", "student_model.pkl")
 
 
@@ -22,7 +24,7 @@ def train_and_save_model():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    # 🔥 Now using 4 features
+    # Using 4 features
     cursor.execute("""
         SELECT age, attendance, marks, interest_level, recommended_course
         FROM students
@@ -37,11 +39,11 @@ def train_and_save_model():
 
     data = np.array(rows)
 
-    # Features (first 4 columns)
-    X = data[:, :-1]
+    # Features (4 columns)
+    X = data[:, 0:4]
 
-    # Target (last column)
-    y = data[:, -1]
+    # Target
+    y = data[:, 4]
 
     # Train test split
     X_train, X_test, y_train, y_test = train_test_split(
@@ -50,34 +52,25 @@ def train_and_save_model():
 
     print("\n========== TRAINING MODELS ==========\n")
 
-    # ===============================
-    # 1️⃣ Decision Tree
-    # ===============================
+    # Decision Tree
     dt_model = DecisionTreeClassifier(random_state=42)
     dt_model.fit(X_train, y_train)
-
     dt_predictions = dt_model.predict(X_test)
+    dt_acc = accuracy_score(y_test, dt_predictions)
 
-    print("Decision Tree Accuracy:", accuracy_score(y_test, dt_predictions))
+    print("Decision Tree Accuracy:", dt_acc)
     print("Decision Tree Report:\n", classification_report(y_test, dt_predictions))
 
-    # ===============================
-    # 2️⃣ Random Forest
-    # ===============================
+    # Random Forest
     rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
     rf_model.fit(X_train, y_train)
-
     rf_predictions = rf_model.predict(X_test)
-
-    print("\nRandom Forest Accuracy:", accuracy_score(y_test, rf_predictions))
-    print("Random Forest Report:\n", classification_report(y_test, rf_predictions))
-
-    # ===============================
-    # Save the better model
-    # ===============================
-    dt_acc = accuracy_score(y_test, dt_predictions)
     rf_acc = accuracy_score(y_test, rf_predictions)
 
+    print("\nRandom Forest Accuracy:", rf_acc)
+    print("Random Forest Report:\n", classification_report(y_test, rf_predictions))
+
+    # Choose best model
     if rf_acc >= dt_acc:
         best_model = rf_model
         print("\n✅ Random Forest selected as final model")
@@ -85,6 +78,7 @@ def train_and_save_model():
         best_model = dt_model
         print("\n✅ Decision Tree selected as final model")
 
+    # Save model
     joblib.dump(best_model, MODEL_PATH)
 
     print("\n🎉 Model trained and saved successfully!")
