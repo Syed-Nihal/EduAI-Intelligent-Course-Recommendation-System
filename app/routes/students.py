@@ -13,7 +13,7 @@ router = APIRouter(prefix="/students", tags=["Students"])
 # Load ML Model
 # ==============================
 
-MODEL_PATH = "app/ml/model.pkl"
+MODEL_PATH = "app/ml/student_model.pkl"
 
 if os.path.exists(MODEL_PATH):
     model = joblib.load(MODEL_PATH)
