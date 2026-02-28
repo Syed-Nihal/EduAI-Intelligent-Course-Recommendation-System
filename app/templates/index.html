@@ -1,113 +1,137 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EduAI | Smart Course Recommendation</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>EduAI - AI Course Recommendation</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
         body {
-            height:100vh;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            display:flex;
-            justify-content:center;
-            align-items:center;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #6a5acd, #8a2be2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
+
         .card {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(15px);
-            padding:40px;
-            width:420px;
-            border-radius:20px;
-            box-shadow:0 15px 35px rgba(0,0,0,0.2);
-            text-align:center;
-            color:white;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            width: 400px;
+            text-align: center;
+            color: white;
         }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 14px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
         input {
-            width:100%;
-            padding:12px;
-            border-radius:10px;
-            border:none;
-            margin-bottom:15px;
-            font-size:15px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
         }
+
         button {
-            width:100%;
-            padding:12px;
-            border-radius:10px;
-            border:none;
-            background:white;
-            color:#764ba2;
-            font-weight:600;
-            cursor:pointer;
+            margin-top: 20px;
+            padding: 12px;
+            width: 100%;
+            border-radius: 10px;
+            border: none;
+            background-color: white;
+            color: #6a5acd;
+            font-weight: bold;
+            cursor: pointer;
         }
-        #result { margin-top:20px; }
-        .result-box {
-            padding:15px;
-            background:rgba(255,255,255,0.2);
-            border-radius:12px;
+
+        .result {
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
         }
     </style>
 </head>
-
 <body>
 
 <div class="card">
     <h1>🎓 EduAI</h1>
     <p>AI Course Recommendation Engine</p>
 
-    <input type="number" id="age" placeholder="Age">
-    <input type="number" id="attendance" placeholder="Attendance %">
-    <input type="number" id="marks" placeholder="Marks">
+    <div class="form-group">
+        <label>Age</label>
+        <input type="number" id="age">
+    </div>
 
-    <button onclick="getRecommendation()">Generate AI Recommendation</button>
+    <div class="form-group">
+        <label>Attendance %</label>
+        <input type="number" id="attendance">
+    </div>
 
-    <div id="result"></div>
+    <div class="form-group">
+        <label>Marks</label>
+        <input type="number" id="marks">
+    </div>
+
+    <div class="form-group">
+        <label>Interest Level (1 - 10)</label>
+        <input type="number" id="interest_level">
+    </div>
+
+    <button onclick="predictCourse()">Generate AI Recommendation</button>
+
+    <div class="result" id="result"></div>
 </div>
 
 <script>
-async function getRecommendation() {
+    async function predictCourse() {
 
-    const age = parseInt(document.getElementById("age").value);
-    const attendance = parseFloat(document.getElementById("attendance").value);
-    const marks = parseFloat(document.getElementById("marks").value);
+        const age = document.getElementById("age").value;
+        const attendance = document.getElementById("attendance").value;
+        const marks = document.getElementById("marks").value;
+        const interest_level = document.getElementById("interest_level").value;
 
-    if (!age || !attendance || !marks) {
-        alert("Please fill all fields");
-        return;
-    }
-
-    try {
         const response = await fetch("/students/predict", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                age: age,
-                attendance: attendance,
-                marks: marks
+                age: parseInt(age),
+                attendance: parseFloat(attendance),
+                marks: parseFloat(marks),
+                interest_level: parseFloat(interest_level)
             })
         });
 
         const data = await response.json();
 
-        if (!response.ok) {
+        if (response.ok) {
             document.getElementById("result").innerHTML =
-                `<div class="result-box">${JSON.stringify(data.detail)}</div>`;
-            return;
+                `Recommended Course: ${data.predicted_course} <br>
+                 Confidence: ${data.confidence}%`;
+        } else {
+            document.getElementById("result").innerText =
+                data.detail || "Something went wrong.";
         }
-
-        document.getElementById("result").innerHTML =
-            `<div class="result-box">
-                <strong>Recommended Course:</strong> ${data.predicted_course}<br>
-                <strong>Confidence:</strong> ${data.confidence_percentage}%
-            </div>`;
-
-    } catch (error) {
-        document.getElementById("result").innerHTML =
-            `<div class="result-box">Server error</div>`;
     }
-}
 </script>
 
 </body>
