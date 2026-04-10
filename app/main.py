@@ -7,18 +7,29 @@ from app.routes.students import router as student_router
 
 app = FastAPI()
 
-# Create DB tables
-create_tables()
+# ==============================
+# 🚀 RUN ON STARTUP
+# ==============================
+@app.on_event("startup")
+def startup_event():
+    print("Creating database tables...")
+    create_tables()
 
-# Include student routes
+
+# ==============================
+# ROUTES
+# ==============================
 app.include_router(student_router)
 
-# Setup templates
+
+# ==============================
+# TEMPLATES
+# ==============================
 templates = Jinja2Templates(directory="app/templates")
 
 
 # ==============================
-# 🏠 Home Page (Frontend UI)
+# HOME
 # ==============================
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
@@ -26,7 +37,7 @@ def home(request: Request):
 
 
 # ==============================
-# ❤️ Health Check Endpoint
+# HEALTH CHECK
 # ==============================
 @app.get("/health")
 def health_check():
