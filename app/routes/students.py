@@ -1,7 +1,18 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from pydantic import BaseModel
 import sqlite3
 
 router = APIRouter(prefix="/students", tags=["Students"])
+
+
+# ==============================
+# 📦 Request Schema (IMPORTANT)
+# ==============================
+class Student(BaseModel):
+    age: int
+    attendance: float
+    marks: float
+    interest_level: int
 
 
 # ==============================
@@ -39,25 +50,18 @@ def get_all_students():
 
 
 # ==============================
-# ➕ Add Student (SAFE VERSION)
+# ➕ Add Student (FIXED)
 # ==============================
 @router.post("/add")
-async def add_student(request: Request):
+def add_student(student: Student):
     try:
-        data = await request.json()
-
-        age = data.get("age")
-        attendance = data.get("attendance")
-        marks = data.get("marks")
-        interest_level = data.get("interest_level")
-
         conn = sqlite3.connect("students.db")
         cursor = conn.cursor()
 
         cursor.execute("""
             INSERT INTO students (age, attendance, marks, interest_level)
             VALUES (?, ?, ?, ?)
-        """, (age, attendance, marks, interest_level))
+        """, (student.age, student.attendance, student.marks, student.interest_level))
 
         conn.commit()
         conn.close()
