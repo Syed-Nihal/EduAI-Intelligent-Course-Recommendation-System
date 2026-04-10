@@ -7,8 +7,9 @@ from app.routes.students import router as student_router
 
 app = FastAPI()
 
+
 # ==============================
-# 🚀 RUN ON STARTUP
+# 🚀 STARTUP EVENT
 # ==============================
 @app.on_event("startup")
 def startup_event():
@@ -37,7 +38,7 @@ def home(request: Request):
 
 
 # ==============================
-# HEALTH CHECK
+# HEALTH
 # ==============================
 @app.get("/health")
 def health_check():
