@@ -1,3 +1,12 @@
+from fastapi import APIRouter
+import sqlite3
+
+router = APIRouter(prefix="/students", tags=["Students"])
+
+
+# ==============================
+# 📊 Get All Students (SAFE)
+# ==============================
 @router.get("/all")
 def get_all_students():
     conn = sqlite3.connect("students.db")
@@ -11,7 +20,7 @@ def get_all_students():
     students = []
     for row in rows:
         students.append({
-            "data": row   # 🔥 SAFE (no index errors)
+            "data": row
         })
 
     return {
