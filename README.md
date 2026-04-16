@@ -1,50 +1,60 @@
-# 🎓 EduAI – Intelligent Course Recommendation System
+# 🎓 Student Intelligent Course Recommendation System
 
-EduAI is a Machine Learning powered course recommendation system built using **FastAPI, Scikit-Learn, and SQLAlchemy**.
+## 🚀 Overview
+This project is an AI-powered backend system that recommends suitable courses for students based on their academic performance and interest level.
 
-It predicts the most suitable course for a student based on academic inputs such as age, attendance, marks, and interest level.
-
----
-
-## 🚀 Features
-
-- Machine Learning based prediction (Random Forest)
-- REST API built with FastAPI
-- Interactive Swagger API documentation
-- SQLite database integration
-- Model comparison (Decision Tree vs Random Forest)
-- Confidence score output
-- Clean modular architecture
-- Production-ready backend structure
+It combines **Machine Learning + Rule-Based Logic + Secure APIs** to deliver accurate and explainable recommendations.
 
 ---
 
-## 🧠 Tech Stack
-
-- Python 3.10+
+## 🛠️ Tech Stack
+- Python
 - FastAPI
-- Scikit-Learn
-- SQLAlchemy
 - SQLite
-- Jinja2
-- Uvicorn
+- Scikit-learn (Decision Tree)
+- JWT Authentication
 
 ---
 
-## 📊 Machine Learning
-
-Models Implemented:
-- Decision Tree Classifier
-- Random Forest Classifier (Selected Final Model)
-
-Evaluation Metrics Used:
-- Accuracy
-- Precision
-- Recall
-- F1-Score
-
-Random Forest was selected as the final production model based on performance comparison.
+## ✨ Features
+- 🔐 User Authentication (Signup/Login using JWT)
+- 📊 Add & View Student Data
+- 🤖 AI-Based Course Recommendation
+- 🧠 Explainable AI (Reason + Confidence)
+- 🔒 Protected API Endpoints
+- ⚡ Fast and lightweight backend
 
 ---
 
-## 📁 Project Structure
+## 🤖 AI Logic
+- Uses **Decision Tree Classifier**
+- Enhanced with **Rule-Based Logic** for better accuracy
+- Provides:
+  - Recommended Course
+  - Reason for recommendation
+  - Confidence level
+
+---
+
+## 📌 API Endpoints
+
+### 🔐 Authentication
+- `POST /auth/signup`
+- `POST /auth/login`
+
+### 🎓 Students
+- `GET /students/all`
+- `POST /students/add`
+- `POST /students/recommend`
+
+---
+
+## 🧪 Example Request
+
+```json
+{
+  "age": 22,
+  "attendance": 95,
+  "marks": 90,
+  "interest_level": 5
+}

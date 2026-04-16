@@ -1,38 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
+# signup
+class UserSignup(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
 
-# ==============================
-# Student Create & Response
-# ==============================
+# login
+class UserLogin(BaseModel):
+    username: str
+    password: str
 
-class StudentBase(BaseModel):
-    name: str
-    email: str
-    age: int
-    course: str
-
-
-class StudentCreate(StudentBase):
-    pass
-
-
-class StudentResponse(StudentBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-
-# ==============================
-# Prediction Schema
-# ==============================
-
-class StudentPredict(BaseModel):
-    age: int
-    attendance: float
-    marks: float
-
-
-class PredictionResponse(BaseModel):
-    predicted_course: str
-    confidence_percentage: float
+# token response
+class Token(BaseModel):
+    access_token: str
+    token_type: str

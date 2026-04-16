@@ -2,10 +2,16 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
+# database
 from app.database import create_tables
-from app.routes.students import router as student_router
 
-app = FastAPI()
+# routers
+from app.routes.students import router as student_router
+from app.routes.auth_routes import router as auth_router
+
+app = FastAPI(
+    title="EduAI - Student Intelligent Course Recommendation System"
+)
 
 
 # ==============================
@@ -13,7 +19,7 @@ app = FastAPI()
 # ==============================
 @app.on_event("startup")
 def startup_event():
-    print("Creating database tables...")
+    print("🚀 Creating database tables...")
     create_tables()
 
 
@@ -21,6 +27,7 @@ def startup_event():
 # ROUTES
 # ==============================
 app.include_router(student_router)
+app.include_router(auth_router)
 
 
 # ==============================
@@ -38,7 +45,7 @@ def home(request: Request):
 
 
 # ==============================
-# HEALTH
+# HEALTH CHECK
 # ==============================
 @app.get("/health")
 def health_check():
