@@ -1,6 +1,5 @@
 import sqlite3
 
-
 # ==============================
 # 📦 CREATE DATABASE TABLES
 # ==============================
@@ -11,10 +10,16 @@ def create_tables():
     print("📦 Creating tables...")
 
     # ==============================
+    # ❌ DROP OLD TABLES (IMPORTANT FIX)
+    # ==============================
+    cursor.execute("DROP TABLE IF EXISTS users")
+    cursor.execute("DROP TABLE IF EXISTS students")
+
+    # ==============================
     # 🎓 STUDENTS TABLE
     # ==============================
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS students (
+    CREATE TABLE students (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         age INTEGER,
         attendance REAL,
@@ -24,18 +29,18 @@ def create_tables():
     """)
 
     # ==============================
-    # 👤 USERS TABLE
+    # 👤 USERS TABLE (FIXED)
     # ==============================
     cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        email TEXT,
-        password TEXT
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
     )
     """)
 
     conn.commit()
     conn.close()
 
-    print("✅ Tables created successfully!")
+    print("✅ Tables recreated successfully!")
